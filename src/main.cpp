@@ -1,12 +1,18 @@
-#include "lox/chunk.hpp"
-#include "lox/debug.hpp"
+#include <iostream>
+
+void start_repl();
+void run_file(const char *);
 
 int main(int argc, const char **argv) {
-  Lox::Chunk chunk;
-
-  u8 constant = chunk.push_constant(1.2);
-  chunk.push_byte(Lox::Inst::Constant);
-  chunk.push_byte(constant);
-
-  Lox::disassemble(chunk, "test chunk");
+  switch (argc) {
+  case 1:
+    start_repl();
+    break;
+  case 2:
+    run_file(argv[1]);
+    break;
+  default:
+    std::cerr << "Usage: " << argv[0] << " [path]\n";
+    break;
+  }
 }

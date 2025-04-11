@@ -2,8 +2,10 @@
 
 #include "lox/chunk.hpp"
 
-namespace Lox {
+namespace Lox::Debug {
 
-void disassemble(const Chunk &chunk, const char *name);
+void print_chunk(const Chunk &chunk, const char *name);
+usize print_instruction(const Chunk &chunk, usize offset);
+void print_stack(const std::vector<Value> &stack);
 
-} // namespace Lox
+} // namespace Lox::Debug

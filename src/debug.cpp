@@ -3,45 +3,49 @@
 #include <iomanip>
 #include <iostream>
 
-class Disassembler {
-public:
-  Disassembler(const Lox::Chunk &chunk) : m_chunk{chunk} {}
+namespace Lox::Debug {
 
-  void print(const char *name) {
-    std::cout << "== " << name << " ==\n";
-    while (m_offset < m_chunk.count()) {
-      print_next_instruction();
-    }
+void print_chunk(const Chunk &chunk, const char *name) {
+  std::cout << '<' << name << ">:\n";
+  for (usize offset = 0; offset < chunk.count();) {
+    offset = print_instruction(chunk, offset);
   }
-
-private:
-  const Lox::Chunk &m_chunk;
-  usize m_offset = 0;
-
-  void print_next_instruction() {
-    std::cout << std::setw(4) << std::setfill('0') << m_offset << ' ';
-    u8 byte = m_chunk.get(m_offset);
-    switch (byte) {
-    case Lox::Inst::Return:
-      print_simple_instruction("OpCode::Return");
-      break;
-    default:
-      std::cout << "Unknown opcode " << byte << '\n';
-      m_offset++;
-    }
-  }
-
-  void print_simple_instruction(const char *name) {
-    std::cout << name << '\n';
-    m_offset++;
-  }
-};
-
-namespace Lox {
-
-void disassemble(const Chunk &chunk, const char *name) {
-  Disassembler disassembler{chunk};
-  disassembler.print(name);
 }
 
-} // namespace Lox
+usize print_instruction(const Chunk &chunk, usize offset) {
+  // Instruction "address"
+  std::cout << "  " << std::hex << std::setfill('0') << std::setw(6) << offset
+            << ":\t";
+
+  u8 byte = chunk.get_byte(offset);
+  switch (byte) {
+  case Inst::Constant: {
+    u8 constant = chunk.get_byte(offset + 1);
+    std::cout << std::setw(2) << static_cast<int>(byte) << ' ' << std::setw(2)
+              << static_cast<int>(constant) << '\t' << static_cast<Inst>(byte)
+              << '\t' << chunk.get_constant(constant) << '\n';
+    return offset + 2;
+  }
+  case Inst::Add:
+  case Inst::Subtract:
+  case Inst::Multiply:
+  case Inst::Divide:
+  case Inst::Negate:
+  case Inst::Return:
+    std::cout << std::setw(2) << static_cast<int>(byte) << '\t'
+              << static_cast<Inst>(byte) << '\n';
+    return offset + 1;
+  default:
+    std::cout << "Unknown opcode " << byte << '\n';
+    return offset + 1;
+  }
+}
+
+void print_stack(const std::vector<Value> &stack) {
+  for (const Value &value : stack) {
+    std::cout << "[ " << value << " ]";
+  }
+  std::cout << '\n';
+}
+
+} // namespace Lox::Debug
