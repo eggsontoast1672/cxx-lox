@@ -14,7 +14,13 @@ enum class InterpretResult {
 
 class VirtualMachine {
 public:
-  InterpretResult interpret(const Chunk &chunk);
+  void compile_source(const std::string &source);
+
+  /// Executes a bytecode chunk.
+  InterpretResult interpret_chunk(const Chunk &chunk);
+
+  /// Executes a source code string.
+  InterpretResult interpret_source(const std::string &code);
 
 private:
   const Chunk *m_chunk = nullptr;

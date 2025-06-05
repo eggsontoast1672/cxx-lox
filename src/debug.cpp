@@ -35,9 +35,7 @@ usize print_instruction(const Chunk &chunk, usize offset) {
     std::cout << std::setw(2) << static_cast<int>(byte) << '\t'
               << static_cast<Inst>(byte) << '\n';
     return offset + 1;
-  default:
-    std::cout << "Unknown opcode " << byte << '\n';
-    return offset + 1;
+  default: std::cout << "Unknown opcode " << byte << '\n'; return offset + 1;
   }
 }
 
